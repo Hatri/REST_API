@@ -14,8 +14,8 @@ router.get('/', async (req, res) => {
     }
 })
 /* Getting One */
-router.get('/:id', (req, res) => {
-    res.send(req.params.id)
+router.get('/:id', getSubscriber, (req, res) => {
+    res.json(res.subscriber)
 })
 /* Creating One */
 router.post('/', async (req, res) => {
@@ -33,13 +33,33 @@ router.post('/', async (req, res) => {
 
 })
 /* Updating One  */
-router.patch('/', (req, res) => {
+router.patch('/', getSubscriber, async (req, res) => {
+    if (req.body.name != null) {
+        res.subscriber.name = req.body.name
+    }
+    if (req.body.subscribedToChannel != null) {
+        res.subscriber.subscribedToChannel = req.body.subscribedToChannel
+    }
+
+    try {
+        const updatedSubscriber = await res.subscriber.save()
+        res.json(updatedSubscriber)
+    } catch (err) {
+        res.status(400).json({ message: err.message })
+
+    }
 
 })
 
 /* Deleting One  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', getSubscriber, async (req, res) => {
+    try {
+        await res.subscriber.remove()
+        res.json({ message: 'Deleted Sub' })
+    } catch (err) {
+        res.status(500).json({ message: err.message })
 
+    }
 })
 
 async function getSubscriber(req, res, next) {
